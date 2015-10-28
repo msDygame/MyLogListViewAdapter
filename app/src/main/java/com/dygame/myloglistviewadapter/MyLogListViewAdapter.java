@@ -84,11 +84,18 @@ public class MyLogListViewAdapter extends BaseAdapter
     {
         mContext = context ;
         inflater = LayoutInflater.from(context);
+        LogList.clear();
     }
 
     public void addLog(String sLog)
     {
         LogList.add(sLog) ;
         notifyDataSetChanged() ;
+    }
+
+    public ArrayList<String> getArrayList()
+    {
+        ArrayList<String> arrayList = (ArrayList<String>) LogList.clone();
+        return arrayList ;
     }
 }

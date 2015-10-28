@@ -1,9 +1,12 @@
 package com.dygame.myloglistviewadapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
@@ -22,6 +25,7 @@ import java.io.Writer;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +42,7 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler
     // 單例模式
     private static MyCrashHandler instance;
     // 程序Context對像
+    private Activity mActivity ;
     private Context mContext;
     // 系統默認的UncaughtException處理類
     private Thread.UncaughtExceptionHandler defalutHandler;
@@ -48,7 +53,7 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler
     // default userInterface
     protected boolean IsSaveCrashToFile = true ;//save crashinfo to file
     protected boolean IsShowCrashFileToLogCat = false ;//load CrashInfo file to logcat by Log.i(string)
-    protected boolean IsCollectDeviceInfo = true ;//collect deviceinfo, but those info..not useful...
+    protected boolean IsCollectDeviceInfo = false ;//collect deviceinfo, but those info..not useful...
     protected boolean IsShowCrashDialog = false;//donot work now.
     protected boolean IsPrintTraceStack = false ;//same as IsSaveCrashToFile by printStackTrace()
     /**
@@ -82,8 +87,9 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler
      * 異常處理初始化
      * @param context
      */
-    public void init(Context context)
+    public void init(Activity activity , Context context)
     {
+        this.mActivity = activity ;
         this.mContext = context;
         // 獲取系統默認的UncaughtException處理器
         defalutHandler = Thread.getDefaultUncaughtExceptionHandler();
@@ -118,6 +124,14 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler
             // 在這裡可以直接殺死應用，安全退出，也可以重起應用，也就是跳轉到app的一個activity。
             // 值得注意的事，由於此時本應用處於出錯狀態，正常的跳轉是沒法完成的。得開新的棧來存放新開起的activity，
             // 所以在跳轉activity是要加上intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);在此時，就相當於重新啟動了一個app。
+            Intent intent = new Intent(mActivity , MyLogActivity.class);
+            ArrayList<String> all_thumbs = MyLogListViewAdapter.getInstance().getArrayList() ;
+            Bundle bundle = new Bundle();
+            bundle.putString("GameID", all_thumbs.get(0));//DEBUG
+            intent.putExtras(bundle);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mActivity.startActivity(intent);
+            //
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
         }
@@ -298,6 +312,8 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler
             //發送給開發人員Logcat
             if (IsShowCrashFileToLogCat == true) sendCrashLogCat(APK_dir + fileName);
             fos.close();
+            Log.e(TAG, "sb=" + sb.toString()) ;
+            MyLogListViewAdapter.getInstance().addLog(sb.toString()) ;
             return fileName;
         }
         catch (Exception e)

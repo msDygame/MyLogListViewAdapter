@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.dygame.myloglistviewadapter" >
+    package="com.dygame.myloglistviewadapter"
+    android:versionCode="2"
+    android:versionName="1.0.0.0" >>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- saveCrashInfoToSDcard -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -16,8 +21,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MyLogActivity"
+            android:label="@string/title_activity_my_log" >
+        </activity>
+        <activity
+            android:name=".MyLogListActivity"
+            android:label="@string/title_activity_my_log" >
+        </activity>
     </application>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />   <!--saveCrashInfoToSDcard -->
+
 </manifest>
